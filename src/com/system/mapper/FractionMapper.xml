@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.mapper.FractionMapper">
+  	<select id="showMark" resultType="com.system.po.Fraction">
+  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid 
+  	</select>
+  	<select id="pageMark" resultType="com.system.po.Fraction">
+  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid limit ${start},${pagesize}
+  	</select>
+  	<select id="selectMark" resultType="com.system.po.Fraction">
+  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid and c.crs_name='${crs_name}'
+  	</select>
+  	<select id="pageselectMark" resultType="com.system.po.Fraction">
+  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid and c.crs_name='${crs_name}' limit ${start},${pagesize}
+  	</select>
+ </mapper>

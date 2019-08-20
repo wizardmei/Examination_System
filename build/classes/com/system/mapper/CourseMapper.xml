@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.mapper.CourseMapper">
+  	<select id="showCourse" resultType="com.system.po.Course">
+  		select * from course
+  	</select>
+  	<select id="stu_showCourse" resultType="com.system.po.Course">
+  		select * from course where crs_class='${crs_class}'
+  	</select>
+  	<select id="selectCourse" resultType="com.system.po.Course">
+  		select * from Course where crs_name='${crs_name}'
+  	</select>
+  	<select id="stu_selectCourse" resultType="com.system.po.Course">
+  		select * from Course where crs_name='${crs_name}' and crs_class='${crs_class}'
+  	</select>
+  	<select id="findById" resultType="com.system.po.Course">
+  		select * from Course where crs_id=${crs_id}
+  	</select>
+  	<select id="pageCourse" resultType="com.system.po.Course">
+  		select * from Course limit ${start},${pagesize}
+  	</select>
+  	<select id="admin_pageCourse" resultType="com.system.po.Course">
+  		select * from Course where crs_name='${crs_name}' limit ${start},${pagesize}
+  	</select>
+  	<select id="stu_pageCourse" resultType="com.system.po.Course">
+  		select * from Course where crs_name='${crs_name}' and crs_class='${crs_class}' limit ${start},${pagesize}
+  	</select>
+  	<select id="schedule_Card" resultType="com.system.po.Course">
+  		select * from Course where crs_class='${crs_class}' and crs_semester='${crs_semester}' 
+  	</select>
+  	<select id="showCrs_semester" resultType="com.system.po.Course">
+  		select crs_semester from Course where crs_class='${crs_class}'
+  	</select>
+  	
+  	
+  	
+  	<update id="editCourse">
+  		update Course set crs_name='${crs_name}',crs_semester='${crs_semester}',crs_time='${crs_time}',crs_frequency='${crs_frequency}',crs_class='${crs_class}',crs_teacher='${crs_teacher}',crs_address='${crs_address}' where crs_code='${crs_code}'
+  	</update>
+  	<insert id="addCourse">
+  		insert into Course(crs_code,crs_name,crs_semester,crs_time,crs_frequency,crs_class,crs_teacher,crs_address) values('${crs_code}','${crs_name}','${crs_semester}','${crs_time}','${crs_frequency}','${crs_class}','${crs_teacher}','${crs_address}')   		
+  	</insert>
+  	<delete id="removeCourse">
+  		delete from Course where crs_id=${crs_id}
+  	</delete>
+ </mapper>
