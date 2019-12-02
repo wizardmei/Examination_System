@@ -6,6 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="icon" href="images/graduate.jpg" type="image/x-icon" />
 	<meta charset="UTF-8">
 	<title>管路员个人页面</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
@@ -24,31 +25,61 @@
 						</div>
 				</div>
 				<table class="table table-bordered">
-					<thead>
-						<tr>
-							<th>学号</th>
-							<th>姓名</th>
-							<th>性别</th>
-							<th>出生年份</th>
-							<th>入学年份</th>
-							<th>学院</th>
-							<th>班级</th>
-							<th>账号</th>
-							<th>密码</th>
-						</tr>
-					</thead>
 					<tbody>
-						<tr>
-							<td>${own.userid }</td>
-							<td>${own.username }</td>
-							<td>${own.sex }</td>
-							<td>${own.birthyear }</td>
-							<td>${own.gradeyear }</td>
-							<td>${own.college }</td>
-							<td>${own.stu_class }</td>
-							<td>${own.account }</td>
-							<td>${own.passwd }</td>
-						</tr>
+						<div>
+							<label>学号</label>
+							<div >
+								${own.userid }
+							</div>
+						</div>
+						<div>
+							<label>姓名</label>
+							<div >
+								${own.username }
+							</div>
+						</div>
+						<div>
+							<label >性别</label>
+							<div >
+								${own.sex }
+							</div>
+						</div>
+						<div>
+							<label >出生年份</label>
+							<div >
+								${own.birthyear }
+							</div>
+						</div>
+						<div>
+							<label>入学年份</label>
+							<div >
+								${own.gradeyear }
+							</div>
+						</div>
+						<div>
+							<label>学院</label>
+							<div>
+								${own.college }
+							</div>
+						</div>
+						<div>
+							<label>班级</label>
+							<div>
+								${own.stu_class }
+							</div>
+						</div>
+						<div>
+							<label>账号</label>
+							<div>
+								${own.account }
+							</div>
+						</div>
+						<div>
+							<label>密码</label>
+							<div>
+								${own.passwd }
+							</div>
+						</div>
 					</tbody>
 				</table>
 			</div>

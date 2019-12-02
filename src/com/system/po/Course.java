@@ -23,6 +23,37 @@ public class Course {
 	private String crs_attribute;
 	
 	private Integer crs_credit;
+	
+	private Integer crs_num;
+	
+	public Course() {
+		
+	}
+
+	public Course( String crs_code, String crs_name,String crs_attribute,
+			Integer crs_credit, String crs_semester, String crs_time, String crs_frequency,String crs_class,
+			 String crs_teacher, String crs_address, 
+			 Integer crs_num) {
+		this.crs_code = crs_code;
+		this.crs_name = crs_name;
+		this.crs_time = crs_time;
+		this.crs_class = crs_class;
+		this.crs_frequency = crs_frequency;
+		this.crs_teacher = crs_teacher;
+		this.crs_address = crs_address;
+		this.crs_semester = crs_semester;
+		this.crs_attribute = crs_attribute;
+		this.crs_credit = crs_credit;
+		this.crs_num = crs_num;
+	}
+
+	public Integer getCrs_num() {
+		return crs_num;
+	}
+
+	public void setCrs_num(Integer crs_num) {
+		this.crs_num = crs_num;
+	}
 
 	public String getCrs_attribute() {
 		return crs_attribute;

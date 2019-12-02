@@ -15,7 +15,7 @@ public interface StudentMapper {
 	public void removeStudent(@Param("userid")Integer userid);
 	
 	public Student findById(@Param("userid")Integer userid);
-		
+	
 	public void editStudent(@Param("userid")Integer userid,@Param("username")String username,@Param("sex")String sex,@Param("birthyear")String birthyear,@Param("gradeyear")String gradeyear,@Param("college")String college,@Param("stu_class")String stu_class,@Param("account")String account,@Param("passwd")String passwd);
 	
 	public void addStudent(@Param("userid")Integer userid,@Param("username")String username,@Param("sex")String sex,@Param("birthyear")String birthyear,@Param("gradeyear")String gradeyear,@Param("college")String college,@Param("stu_class")String stu_class,@Param("account")String account,@Param("passwd")String passwd);
@@ -23,5 +23,9 @@ public interface StudentMapper {
 	public List<Student> selectStudent(@Param("username")String username);
 	
 	public List<Student> stu_pageStudent(@Param("start")Integer start,@Param("pagesize")Integer pagesize,@Param("username")String username);
+	
+	public List<Student> findByStuClass(@Param("stu_class")String stu_class);
+	
+	public List<Student> showClasses();
 	
 }

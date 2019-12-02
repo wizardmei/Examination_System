@@ -10,11 +10,19 @@ public interface CourseMapper {
 
 	public List<Course> showCourse();
 	
+	public List<Course> showElectiveCourse();
+	
+	public List<Course> pageElectiveCourse(@Param("start")Integer start,@Param("pagesize")Integer pagesize);
+	
 	public List<Course> stu_showCourse(@Param("crs_class")String crs_class);
+	
+	public List<Course> stu_showCourse1(@Param("userid")Integer userid);
 	
 	public List<Course> pageCourse(@Param("start")Integer start,@Param("pagesize")Integer pagesize);
 	
-	public List<Course> stu_pageCourse(@Param("start")Integer start,@Param("pagesize")Integer pagesize,@Param("crs_name")String crs_name,@Param("crs_class")String crs_class);
+	public List<Course> stu_pageCourse1(@Param("userid")Integer userid,@Param("start")Integer start,@Param("pagesize")Integer pagesize);
+	
+	public List<Course> stu_pageCourse(@Param("start")Integer start,@Param("pagesize")Integer pagesize,@Param("crs_name")String crs_name,@Param("userid")Integer userid);
 	
 	public List<Course> admin_pageCourse(@Param("start")Integer start,@Param("pagesize")Integer pagesize,@Param("crs_name")String crs_name);
 	
@@ -25,7 +33,10 @@ public interface CourseMapper {
 	public void editCourse(@Param("crs_code")String crs_code,@Param("crs_name")String crs_name,@Param("crs_attribute")String crs_attribute,@Param("crs_credit")Integer crs_credit,@Param("crs_semester")String crs_semester,@Param("crs_time")String crs_time,@Param("crs_frequency")String crs_frequency,@Param("crs_class")String crs_class,@Param("crs_teacher")String crs_teacher,@Param("crs_address")String crs_address);
 	
 	public void addCourse(@Param("crs_code")String crs_code,@Param("crs_name")String crs_name,@Param("crs_attribute")String crs_attribute,@Param("crs_credit")Integer crs_credit,@Param("crs_semester")String crs_semester,@Param("crs_time")String crs_time,@Param("crs_frequency")String crs_frequency,@Param("crs_class")String crs_class,@Param("crs_teacher")String crs_teacher,@Param("crs_address")String crs_address);
+	
+	public void addElecctiveCourse(@Param("crs_code")String crs_code,@Param("crs_name")String crs_name,@Param("crs_attribute")String crs_attribute,@Param("crs_credit")Integer crs_credit,@Param("crs_semester")String crs_semester,@Param("crs_time")String crs_time,@Param("crs_frequency")String crs_frequency,@Param("crs_num")Integer crs_num,@Param("crs_teacher")String crs_teacher,@Param("crs_address")String crs_address);
 
+	
 	public List<Course> selectCourse(@Param("crs_name")String crs_name);
 	
 	public List<Course> stu_selectCourse(@Param("crs_name")String crs_name,@Param("crs_class")String crs_class);

@@ -2,22 +2,12 @@ package com.system.controller;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.system.mapper.CourseMapper;
+import com.system.mapper.MoMCourseMapper;
 import com.system.mapper.StudentMapper;
 import com.system.mapper.TeacherMapper;
 import com.system.mapper.UserLoginMapper;
@@ -32,6 +23,8 @@ import com.system.po.Course;
 import com.system.po.Student;
 import com.system.po.Teacher;
 import com.system.po.UserLogin;
+import com.system.poi.DownLoadMessage;
+
 
 @Controller
 public class AdminController {
@@ -53,6 +46,9 @@ public class AdminController {
 	
 	@Autowired
 	private UserLoginMapper userloginmapper;
+	
+	@Autowired
+	private MoMCourseMapper momcoursemapper;
 	
 	@Autowired
 	private TeacherMapper teachermapper;
@@ -111,12 +107,14 @@ public class AdminController {
 		return username==null?new ModelAndView("redirect:/login"):mav;
 	}
 	
+	
 	@RequestMapping(value="/admin/removeStudent")
 	public ModelAndView removeStudent(HttpServletRequest request,HttpServletResponse response) {
 		ModelAndView mav = new ModelAndView("redirect:/admin/showStudent");
 		Integer userid = Integer.parseInt(request.getParameter("id"));
+		String account = studentmapper.findById(userid).getAccount();
 		studentmapper.removeStudent(userid);
-		userloginmapper.deleteUser(studentmapper.findById(userid).getAccount());
+		userloginmapper.deleteUser(account);
 		return username==null?new ModelAndView("redirect:/login"):mav;
 	}
 	
@@ -174,7 +172,16 @@ public class AdminController {
 		userloginmapper.createUser(account, passwd, 2);
 		return username==null?new ModelAndView("redirect:/login"):mav;
 	}
-	
+
+	@RequestMapping(value="/admin/modelStudent")
+	public void modelStudent(HttpServletRequest request,HttpServletResponse response) throws IOException {
+		String[] headers = {"学号","姓名","性别","出生年份","入学年份","学院","班级","学生账号","账号密码"};
+		List<Student> ls = new ArrayList<Student>();
+		Student model = new Student(123456,"张三","男","2000","2019","云计算系","大数据","zhangsan","123456"); 
+		ls.add(model);
+		DownLoadMessage<Student> downLoad = new DownLoadMessage<>(headers, ls, response);
+		downLoad.download();
+	}
 	@RequestMapping(value="/admin/selectStudent",method= {RequestMethod.POST})
 	public ModelAndView selectStudent(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
 		ModelAndView mav = new ModelAndView("admin/showStudent");
@@ -202,50 +209,11 @@ public class AdminController {
 		return mav;
 	}
 		
-	@RequestMapping(value="/downloadStudent")
+	@RequestMapping(value="/admin/downloadStudent")
 	public void downloadStudent(HttpServletRequest request,HttpServletResponse response) throws IOException {
 		String[] headers = {"学号","姓名","性别","出生年份","入学年份","学院","班级","学生账号","账号密码"};
-		HSSFWorkbook workbook = new HSSFWorkbook();
-		HSSFSheet sheet = workbook.createSheet();
-		sheet.setDefaultColumnWidth((short)18);
-		HSSFRow row = sheet.createRow(0);
-		for(short i=0;i< headers.length; i++) {
-			HSSFCell cell = row.createCell(i);
-			HSSFRichTextString text = new HSSFRichTextString(headers[i]);
-			cell.setCellValue(text);
-		}
-		Iterator<Student> it = stu_list.iterator();
-		int index = 0;
-		while(it.hasNext()) {
-			index++;
-			row = sheet.createRow(index);
-			Student student = it.next();
-			
-			Field[] fields = student.getClass().getDeclaredFields();
-			for(short i = 0;i< fields.length;i++) {
-				HSSFCell cell = row.createCell(i);
-				Field field = fields[i];
-				String fieldName = field.getName();
-				String getMethodName = "get" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1); 
-				try {
-					Class stu_Cls = student.getClass();
-					Method getMethod = stu_Cls.getMethod(getMethodName, new Class[] {});
-					Object value = getMethod.invoke(student, new Object[] {});
-					String textValue = value.toString();
-					HSSFRichTextString richString = new HSSFRichTextString(textValue);
-					HSSFFont font3 = workbook.createFont();
-					font3.setColor(HSSFColor.HSSFColorPredefined.BLUE.getIndex());
-					richString.applyFont(font3);
-					cell.setCellValue(richString);
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		response.setContentType("application/octet-stream");
-		response.setHeader("Content-disposition", "attachment;filename=StudentList"+(new Date()).toString()+".xls");
-		response.flushBuffer();
-		workbook.write(response.getOutputStream());
+		DownLoadMessage<Student> downLoad = new DownLoadMessage<>(headers,stu_list,response);
+		downLoad.download();
 	}
 	
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>修改密码<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
@@ -293,6 +261,103 @@ public class AdminController {
 		mav.addObject("tcr_num", tcr_list.size());
 		return mav;
 	}
+	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>教师管理<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+	@RequestMapping(value="/admin/showTeacher")
+	public ModelAndView showTeacher(HttpServletRequest request,HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView("admin/showTeacher");
+		crs_list = coursemapper.showCourse();
+		Integer pagenum = (int) Math.ceil((double)tcr_list.size()/pagesize);
+		List<Teacher> pageList = teachermapper.pageCourse(start, pagesize);
+		if(request.getParameter("page") != null) {
+			Integer newstart = start+pagesize*(Integer.parseInt(request.getParameter("page"))-1);
+			Integer newpagesize = Integer.parseInt(request.getParameter("page"))*pagesize;
+			pageList = teachermapper.pageCourse(newstart, newpagesize);
+		}
+		Integer page;
+		if(request.getParameter("page") == null || Integer.parseInt(request.getParameter("page")) == 1) {
+			page = 1;
+		}else if (Integer.parseInt(request.getParameter("page")) == pagenum){
+			page = pagenum;
+		}else {
+			page = Integer.parseInt(request.getParameter("page"));
+		}
+		mav.addObject("page", page);
+		mav.addObject("username", username);
+		mav.addObject("pagenum", pagenum);
+		mav.addObject("crs_list", pageList);
+		mav.addObject("stu_num", stu_list.size());
+		mav.addObject("crs_num", crs_list.size());
+		mav.addObject("tcr_num", tcr_list.size());
+		return username==null?new ModelAndView("redirect:/login"):mav;
+	}
+	
+	@RequestMapping(value="/admin/removeTeacher")
+	public ModelAndView removeTeacher(HttpServletRequest request,HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView("redirect:/admin/showCourse");
+		Integer tcr_id = Integer.parseInt(request.getParameter("id"));
+		teachermapper.removeTeacher(tcr_id);
+		return username==null?new ModelAndView("redirect:/login"):mav;
+	}
+	
+	@RequestMapping(value="/admin/editTeacher",method= {RequestMethod.GET})
+	public ModelAndView editTeacher(HttpServletRequest request,HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView("admin/editTeacher");
+		mav.addObject("username", username);
+		Teacher target = teachermapper.findById(Integer.parseInt(request.getParameter("id")));
+		mav.addObject("target", target);
+		mav.addObject("stu_num", stu_list.size());
+		mav.addObject("crs_num", crs_list.size());
+		mav.addObject("tcr_num", tcr_list.size());
+		return username==null?new ModelAndView("redirect:/login"):mav;
+	}
+	@RequestMapping(value="/admin/editTeacher",method= {RequestMethod.POST})
+	public ModelAndView edit_Teacher(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
+		ModelAndView mav = new ModelAndView("redirect:/admin/showTeacher");
+		return username==null?new ModelAndView("redirect:/login"):mav;
+	}
+	
+	@RequestMapping(value="/admin/addTeacher",method= {RequestMethod.GET})
+	public ModelAndView addTeacher1(HttpServletRequest request,HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView("admin/addCourse");
+		mav.addObject("username", username);
+		mav.addObject("stu_num", stu_list.size());
+		mav.addObject("crs_num", crs_list.size());
+		mav.addObject("tcr_num", tcr_list.size());
+		return mav;
+	}
+	
+	@RequestMapping(value="/admin/addTeacher",method= {RequestMethod.POST})
+	public ModelAndView addTeacher(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
+		ModelAndView mav = new ModelAndView("redirect:/admin/showCourse");
+		return username==null?new ModelAndView("redirect:/login"):mav;
+	}
+	
+	@RequestMapping(value="/admin/selectTeacher",method= {RequestMethod.POST})
+	public ModelAndView selectTeacher(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
+		ModelAndView mav = new ModelAndView("admin/showCourse");
+		String course_name = new String(request.getParameter("findByName").getBytes("ISO-8859-1"),"UTF-8");
+		List<Course> crs_list = coursemapper.selectCourse(course_name);
+		Integer pagenum = (int) Math.ceil((double)crs_list.size()/pagesize);
+		List<Course> pageList = coursemapper.admin_pageCourse(start, pagesize, course_name);
+		if(request.getParameter("page") != null) {
+			Integer newstart = start+pagesize*(Integer.parseInt(request.getParameter("page"))-1);
+			Integer newpagesize = Integer.parseInt(request.getParameter("page"))*pagesize;
+			pageList = coursemapper.admin_pageCourse(newstart, newpagesize, course_name);
+		}
+		Integer page;
+		if(request.getParameter("page") == null || Integer.parseInt(request.getParameter("page")) == 1) {
+			page = 1;
+		}else if (Integer.parseInt(request.getParameter("page")) == pagenum){
+			page = pagenum;
+		}else {
+			page = Integer.parseInt(request.getParameter("page"));
+		}
+		mav.addObject("crs_list", pageList);
+		mav.addObject("page", page);
+		mav.addObject("username", username);
+		mav.addObject("pagenum", pagenum);
+		return mav;
+	}
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>课程管理<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 	@RequestMapping(value="/admin/showCourse")
 	public ModelAndView showCourse(HttpServletRequest request,HttpServletResponse response) {
@@ -322,7 +387,7 @@ public class AdminController {
 		mav.addObject("tcr_num", tcr_list.size());
 		return username==null?new ModelAndView("redirect:/login"):mav;
 	}
-	
+
 	@RequestMapping(value="/admin/removeCourse")
 	public ModelAndView removeCourse(HttpServletRequest request,HttpServletResponse response) {
 		ModelAndView mav = new ModelAndView("redirect:/admin/showCourse");
@@ -362,6 +427,8 @@ public class AdminController {
 	@RequestMapping(value="/admin/addCourse",method= {RequestMethod.GET})
 	public ModelAndView addCourse1(HttpServletRequest request,HttpServletResponse response) {
 		ModelAndView mav = new ModelAndView("admin/addCourse");
+		List<Student> stu_class = studentmapper.showClasses();
+		mav.addObject("stu_class",stu_class);
 		mav.addObject("username", username);
 		mav.addObject("stu_num", stu_list.size());
 		mav.addObject("crs_num", crs_list.size());
@@ -382,10 +449,22 @@ public class AdminController {
 		String crs_semester = new String(request.getParameter("crs_semester").getBytes("ISO-8859-1"),"UTF-8");
 		String crs_attribute = new String(request.getParameter("crs_attribute").getBytes("ISO-8859-1"),"UTF-8");
 		Integer crs_credit = Integer.parseInt(request.getParameter("crs_credit"));
+		List<Student> stu_classes = studentmapper.findByStuClass(crs_class);
+		for (Student student : stu_classes) {
+			momcoursemapper.addInfo(student.getUserid(), crs_code, crs_attribute);
+		}
 		coursemapper.addCourse( crs_code, crs_name,crs_attribute,crs_credit,crs_semester, crs_time,crs_frequency, crs_class, crs_teacher, crs_address);
 		return username==null?new ModelAndView("redirect:/login"):mav;
 	}
-	
+	@RequestMapping(value="/admin/modelCourse")
+	public void modelCourse(HttpServletRequest request,HttpServletResponse response) throws IOException {
+		String[] headers = {"课程代码","课程名","课程属性","课程学分","课程学期","课程时间","课程周次","课程班级","课程老师","课程地点","课程人数"};
+		List<Course> ls = new ArrayList<Course>();
+		Course model = new Course("CC123456","操作系统","必修",2,"2019-2020年第二学期","周一1、2节","12周次","大数据1班","张三","二教111",123); 
+		ls.add(model);
+		DownLoadMessage<Course> downLoad = new DownLoadMessage<>(headers, ls, response);
+		downLoad.download();
+	}
 	@RequestMapping(value="/admin/selectCourse",method= {RequestMethod.POST})
 	public ModelAndView selectCourse(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
 		ModelAndView mav = new ModelAndView("admin/showCourse");
@@ -413,52 +492,52 @@ public class AdminController {
 		return mav;
 	}
 	
-	@RequestMapping(value="/downloadCourse")
+	@RequestMapping(value="/admin/downloadCourse")
 	public void downloadCourse(HttpServletRequest request,HttpServletResponse response) throws IOException {
 		String[] headers = {"课程ID","课程代码","课程名称","课程属性","课程学分","课程学期","课程时间","课程周次","课程班级","课程老师","课程地址"};
-		HSSFWorkbook workbook = new HSSFWorkbook();
-		HSSFSheet sheet = workbook.createSheet();
-		sheet.setDefaultColumnWidth((short)18);
-		HSSFRow row = sheet.createRow(0);
-		for(short i=0;i< headers.length; i++) {
-			HSSFCell cell = row.createCell(i);
-			HSSFRichTextString text = new HSSFRichTextString(headers[i]);
-			cell.setCellValue(text);
-		}
-		Iterator<Course> it = crs_list.iterator();
-		int index = 0;
-		while(it.hasNext()) {
-			index++;
-			row = sheet.createRow(index);
-			Course course = it.next();
-			
-			Field[] fields = course.getClass().getDeclaredFields();
-			for(short i = 0;i< fields.length;i++) {
-				HSSFCell cell = row.createCell(i);
-				Field field = fields[i];
-				String fieldName = field.getName();
-				String getMethodName = "get" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1); 
-				try {
-					Class stu_Cls = course.getClass();
-					Method getMethod = stu_Cls.getMethod(getMethodName, new Class[] {});
-					Object value = getMethod.invoke(course, new Object[] {});
-					String textValue = value.toString();
-					HSSFRichTextString richString = new HSSFRichTextString(textValue);
-					HSSFFont font3 = workbook.createFont();
-					font3.setColor(HSSFColor.HSSFColorPredefined.BLUE.getIndex());
-					richString.applyFont(font3);
-					cell.setCellValue(richString);
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		response.setContentType("application/octet-stream");
-		response.setHeader("Content-disposition", "attachment;filename=CourseList"+(new Date()).toString()+".xls");
-		response.flushBuffer();
-		workbook.write(response.getOutputStream());
+		DownLoadMessage<Course> download = new DownLoadMessage<>(headers, crs_list, response);
+		download.download();
 	}
-	
+	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>添加选课<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+	@RequestMapping(value="/admin/ElectiveCourse",method= {RequestMethod.GET})
+	public ModelAndView electiveCourse1(HttpServletRequest request,HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView("admin/ElectiveCourse");
+		mav.addObject("username", username);
+		mav.addObject("stu_num", stu_list.size());
+		mav.addObject("crs_num", crs_list.size());
+		mav.addObject("tcr_num", tcr_list.size());
+		return mav;
+	}
+	@RequestMapping(value="/admin/ElectiveCourse",method= {RequestMethod.POST})
+	public ModelAndView electiveCourse(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
+		ModelAndView mav = new ModelAndView("redirect:/admin/ElectiveCourse");
+		String crs_name = new String(request.getParameter("crs_name").getBytes("ISO-8859-1"),"UTF-8");
+		String crs_code = new String(request.getParameter("crs_code").getBytes("ISO-8859-1"),"UTF-8");
+		String crs_time = new String(request.getParameter("crs_time").getBytes("ISO-8859-1"),"UTF-8");
+		String crs_frequency = new String(request.getParameter("crs_frequency").getBytes("ISO-8859-1"),"UTF-8");
+		Integer crs_num = Integer.parseInt(request.getParameter("crs_num"));
+		String crs_address = new String(request.getParameter("crs_address").getBytes("ISO-8859-1"),"UTF-8");
+		String crs_teacher = new String(request.getParameter("crs_teacher").getBytes("ISO-8859-1"),"UTF-8");
+		String crs_semester = new String(request.getParameter("crs_semester").getBytes("ISO-8859-1"),"UTF-8");
+		String crs_attribute = new String(request.getParameter("crs_attribute").getBytes("ISO-8859-1"),"UTF-8");
+		Integer crs_credit = Integer.parseInt(request.getParameter("crs_credit"));
+		coursemapper.addElecctiveCourse( crs_code, crs_name,crs_attribute,crs_credit,crs_semester, crs_time,crs_frequency, crs_num, crs_teacher, crs_address);
+		return username==null?new ModelAndView("redirect:/login"):mav;
+	}
+	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>导入信息<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+	@RequestMapping(value="/admin/uploadMessage",method = {RequestMethod.GET})
+	public ModelAndView uploadMessage(HttpServletRequest request,HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView("admin/uploadMessage");
+		mav.addObject("username",username);
+		mav.addObject("stu_num", stu_list.size());
+		mav.addObject("trc_num",tcr_list.size());
+		return mav;
+	}
+	@RequestMapping(value="/admin/uploadMessage",method = {RequestMethod.POST})
+	public ModelAndView uploadMessage1(HttpServletRequest request,HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView("redirect:/admin/uploadMessage");
+		return mav;
+	}
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>登出<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 	@RequestMapping(value="/admin/logout")
 	public ModelAndView logout(HttpServletRequest request,HttpServletResponse response) {

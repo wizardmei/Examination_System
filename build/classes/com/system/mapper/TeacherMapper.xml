@@ -4,4 +4,17 @@
   	<select id="showTeacher" resultType="com.system.po.Teacher">
   		select * from teacher
   	</select>
+  	<select id="findByUsername" resultType="com.system.po.Teacher">
+  		select * from teacher where username = '${username}'
+  	</select>
+  	<select id="pageCourse" resultType="com.system.po.Teacher">
+  		select * from teacher limit ${start},${pagesize}
+  	</select>
+  	  	<select id="findById" resultType="com.system.po.Teacher">
+  		select * from teacher where userid=${tcr_id}
+  	</select>
+  	
+  	<delete id="removeTeacher">
+  		delete from teacher where userid=${tcr_id}
+  	</delete>
  </mapper>

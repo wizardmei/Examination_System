@@ -6,6 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="icon" href="images/graduate.jpg" type="image/x-icon" />
 	<meta charset="UTF-8">
 	<title>管路员个人页面</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">

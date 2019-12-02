@@ -2,15 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.system.mapper.FractionMapper">
   	<select id="showMark" resultType="com.system.po.Fraction">
-  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid 
+		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid and c.crs_code=f.crs_code
   	</select>
   	<select id="pageMark" resultType="com.system.po.Fraction">
-  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid limit ${start},${pagesize}
+  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid and c.crs_code=f.crs_code limit ${start},${pagesize}
   	</select>
   	<select id="selectMark" resultType="com.system.po.Fraction">
-  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid and c.crs_name='${crs_name}'
+  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid and c.crs_name='${crs_name}' and c.crs_code=f.crs_code
   	</select>
   	<select id="pageselectMark" resultType="com.system.po.Fraction">
-  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid and c.crs_name='${crs_name}' limit ${start},${pagesize}
+  		select c.crs_code,c.crs_name,c.crs_credit,c.crs_attribute,f.mark from student s,course c,fraction f where s.userid=${userid} and s.userid=f.userid and c.crs_name='${crs_name}' and c.crs_code=f.crs_code limit ${start},${pagesize}
+  	</select>
+  	<select id="isEmpty" resultType="com.system.po.Fraction">
+		select * from fraction,student,momcourse where student.userid = ${userid} and student.userid = fraction.userid and momcourse.crs_code='${crs_code}' and momcourse.crs_code = fraction.crs_code
   	</select>
  </mapper>

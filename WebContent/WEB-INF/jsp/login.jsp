@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 	<meta charset="UTF-8">
 	<title>用户登陆界面</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">

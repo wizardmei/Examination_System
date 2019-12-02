@@ -3,16 +3,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="icon" href="images/graduate.jpg" type="image/x-icon" />
 	<meta charset="UTF-8">
 	<title>教师个人页面</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
 	<script src="${pageContext.request.contextPath}/js/jquery-3.2.1.min.js"></script>
 	<script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
-	<style type="text/css">
-	body{
-	   background: url("${pageContext.request.contextPath}/images/b.jpg")repeat;
-	}
-	</style>
 </head>
 <body>
 	<jsp:include page="top.jsp"></jsp:include>

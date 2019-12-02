@@ -17,4 +17,5 @@ public interface FractionMapper {
 	
 	public List<Fraction> pageselectMark(@Param("start")Integer start,@Param("pagesize")Integer pagesize,@Param("userid")Integer userid,@Param("crs_name")String crs_name);
 	
+	public Fraction isEmpty(@Param("userid")Integer userid,@Param("crs_code")String crs_code);
 }

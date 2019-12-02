@@ -2,10 +2,10 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"  prefix="fmt" %>
-    
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 	<meta charset="UTF-8">
 	<title>管路员个人页面</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
@@ -34,10 +34,11 @@
 								添加学生信息
 								<span class="glyphicon glyphicon-plus"></span>
 							</button>
-							<button class="btn btn-default col-md-2 pull-right" style="margin-top:20px;" onClick="location.href='${pageContext.request.contextPath}/downloadStudent'">
+							<button class="btn btn-default col-md-2 pull-right" style="margin-top:20px;" onClick="location.href='${pageContext.request.contextPath}/admin/downloadStudent'">
 								导出学生信息
 								<span class="glyphicon glyphicon-file"></span>
 							</button>
+							
 						</div>
 				</div>
 				<table class="table table-bordered">

@@ -6,6 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon" />
 	<meta charset="UTF-8">
 	<title>管路员个人页面</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
@@ -34,7 +35,7 @@
 								添加课程信息
 								<span class="glyphicon glyphicon-plus"></span>
 							</button>
-							<button class="btn btn-default col-md-2 pull-right" style="margin-top:20px;" onClick="location.href='${pageContext.request.contextPath}/downloadCourse'">
+							<button class="btn btn-default col-md-2 pull-right" style="margin-top:20px;" onClick="location.href='${pageContext.request.contextPath}/admin/downloadCourse'">
 								导出课程信息
 								<span class="glyphicon glyphicon-file"></span>
 							</button>
@@ -53,6 +54,7 @@
 							<th>课程班级</th>
 							<th>课程老师</th>
 							<th>课程地点</th>
+							<th>课程人数</th>
 							<th>操作</th>
 						</tr>
 					</thead>
@@ -69,6 +71,7 @@
 								<td>${item.crs_class }</td>
 								<td>${item.crs_teacher }</td>
 								<td>${item.crs_address }</td>
+								<td>${item.crs_num} </td>
 								<td>
 									<button class="btn btn-default btn-xs btn-info" onClick="location.href='${pageContext.request.contextPath}/admin/editCourse?id=${item.crs_id}'">修改</button>
 									<button class="btn btn-default btn-xs btn-danger btn-primary" onClick="location.href='${pageContext.request.contextPath}/admin/removeCourse?id=${item.crs_id}'">删除</button>

@@ -43,3 +43,22 @@ userid int(11) not null,
 crs_code varchar(255) not null,
 mark int(11) not null
 );
+
+create table electiveCourse(
+crs_id int(11) Primary Key not null,
+crs_code varchar(255) not null,
+crs_name varchar(200) not null,
+crs_attribute varchar(255) not null,
+crs_credit int(11) not null,
+crs_semester varchar(200) not null,
+crs_time varchar(200) not null,
+crs_number int(11) not null
+crs_teacher varchar(200) not null,
+crs_address varchar(200) not null,);
+
+create table role(
+roleId int(5) Primary Key not null,
+roleName varchar(255) not null,
+permissions varchar(255) default null
+);
+insert into role value(0,'admin',null),(2,'student',null),(1,'teacher',null);

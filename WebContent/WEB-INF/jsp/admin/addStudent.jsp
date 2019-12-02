@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon" />
 	<meta charset="UTF-8">
 	<title>添加学生信息</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">

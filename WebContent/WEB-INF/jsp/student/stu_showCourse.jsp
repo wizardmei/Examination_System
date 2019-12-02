@@ -6,6 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="icon" href="images/graduate.jpg" type="image/x-icon" />
 	<meta charset="UTF-8">
 	<title>管路员个人页面</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
@@ -71,11 +72,11 @@
 				<div class="panel-footer">
 					<nav style="text-align:center">
 						<ul class="pagination">
-							<c:if test="${page != 1}"><li><a href="${pageContext.request.contextPath}/student/showCourse?page=${page-1}">&laquo;上一页</a></li></c:if>
+							<c:if test="${page != 1}"><li><a href="${pageContext.request.contextPath}/student/stu_showCourse?page=${page-1}">&laquo;上一页</a></li></c:if>
 							<c:forEach var="i" begin="1" end="${pagenum }">
-								<li><a href="${pageContext.request.contextPath }/student/showCourse?page=${i}">${i }</a></li>
+								<li><a href="${pageContext.request.contextPath }/student/stu_showCourse?page=${i}">${i }</a></li>
 							</c:forEach>
-							<c:if test="${page != pagenum}"><li ><a href="${pageContext.request.contextPath}/student/showCourse?page=${page+1}">下一页&raquo;</a></li></c:if>
+							<c:if test="${page != pagenum}"><li ><a href="${pageContext.request.contextPath}/student/stu_showCourse?page=${page+1}">下一页&raquo;</a></li></c:if>
 						</ul>
 					</nav>
 				</div>

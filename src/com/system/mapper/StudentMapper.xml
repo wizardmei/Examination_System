@@ -16,12 +16,21 @@
   	<select id="stu_pageStudent" resultType="com.system.po.Student">
   		select * from student where username=${username} limit ${start},${pagesize}
   	</select>
+  	<select id="findByStuClass" resultType="com.system.po.Student">
+  		select * from student where stu_class='${stu_class}'
+  	</select>
+  	<select id="showClasses" resultType="com.system.po.Student">
+  		select stu_class from student group by stu_class
+  	</select>
+  	
   	<update id="editStudent">
   		update student set username='${username}',sex='${sex}',birthyear='${birthyear}',gradeyear='${gradeyear}',college='${college}',stu_class='${stu_class}',account='${account}',passwd='${passwd}' where userid=${userid}
   	</update>
+  	
   	<insert id="addStudent">
   		insert into student values(${userid},'${username}','${sex}','${birthyear}','${gradeyear}','${college}','${stu_class}','${account}','${passwd}')   		
   	</insert>
+  	
   	<delete id="removeStudent">
   		delete from student where userid=${userid}
   	</delete>

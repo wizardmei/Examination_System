@@ -2,22 +2,11 @@ package com.system.controller;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,12 +14,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import com.system.mapper.CourseMapper;
 import com.system.mapper.FractionMapper;
+import com.system.mapper.MoMCourseMapper;
 import com.system.mapper.StudentMapper;
 import com.system.mapper.UserLoginMapper;
 import com.system.po.Course;
 import com.system.po.Fraction;
+import com.system.po.MoMCourse;
 import com.system.po.Student;
 import com.system.po.UserLogin;
+import com.system.poi.DownLoadMessage;
 
 @Controller
 public class StudentController {
@@ -45,6 +37,9 @@ public class StudentController {
 	
 	@Autowired
 	private FractionMapper fractionmapper;
+	
+	@Autowired
+	private MoMCourseMapper momcoursemapper;
 	
 	@Autowired
 	private UserLoginMapper userloginmapper;
@@ -79,8 +74,6 @@ public class StudentController {
 		mav.addObject("semesters", semesters);
 		return mav;
 	}
-	
-	
 	@RequestMapping(value="/student/Schedule_Card",method= {RequestMethod.POST})
 	public ModelAndView schedule_Card(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
 		ModelAndView mav = new ModelAndView("student/Schedule_Card");
@@ -168,10 +161,10 @@ public class StudentController {
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>课程信息<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 	@RequestMapping(value="/student/stu_showCourse")
 	public ModelAndView showCourse(HttpServletRequest request,HttpServletResponse response) {
-		ModelAndView mav = new ModelAndView("student/showCourse");
-		List<Course> crs_list = coursemapper.stu_showCourse(own.getStu_class());
+		ModelAndView mav = new ModelAndView("student/stu_showCourse");
+		List<Course> crs_list = coursemapper.stu_showCourse1(own.getUserid());
 		Integer pagenum = (int) Math.ceil((double)crs_list.size()/pagesize);
-		List<Course> pageList = coursemapper.pageCourse(start, pagesize);
+		List<Course> pageList = coursemapper.stu_pageCourse1(own.getUserid(), start, pagesize);
 		if(request.getParameter("page") != null) {
 			Integer newstart = start+pagesize*(Integer.parseInt(request.getParameter("page"))-1);
 			Integer newpagesize = Integer.parseInt(request.getParameter("page"))*pagesize;
@@ -221,15 +214,15 @@ public class StudentController {
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>查找课程<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 	@RequestMapping(value="/student/selectCourse",method= {RequestMethod.POST})
 	public ModelAndView selectCourse(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
-		ModelAndView mav = new ModelAndView("admin/showCourse");
+		ModelAndView mav = new ModelAndView("student/showCourse");
 		String course_name = new String(request.getParameter("findByName").getBytes("ISO-8859-1"),"UTF-8");
 		List<Course> crs_list = coursemapper.stu_selectCourse(course_name,own.getStu_class());
 		Integer pagenum = (int) Math.ceil((double)crs_list.size()/pagesize);
-		List<Course> pageList = coursemapper.stu_pageCourse(start, pagesize, course_name,own.getStu_class());
+		List<Course> pageList = coursemapper.stu_pageCourse(start, pagesize, course_name,own.getUserid());
 		if(request.getParameter("page") != null) {
 			Integer newstart = start+pagesize*(Integer.parseInt(request.getParameter("page"))-1);
 			Integer newpagesize = Integer.parseInt(request.getParameter("page"))*pagesize;
-			pageList = coursemapper.stu_pageCourse(newstart, newpagesize, course_name,own.getStu_class());
+			pageList = coursemapper.stu_pageCourse(newstart, newpagesize, course_name,own.getUserid());
 		}
 		Integer page;
 		if(request.getParameter("page") == null || Integer.parseInt(request.getParameter("page")) == 1) {
@@ -276,95 +269,17 @@ public class StudentController {
 	@RequestMapping(value="/downloadMark")
 	public void downloadMark(HttpServletRequest request,HttpServletResponse response) throws IOException {
 		String[] headers = {"课程代码","课程名称","课程属性","课程学分","课程成绩"};
-		HSSFWorkbook workbook = new HSSFWorkbook();
-		HSSFSheet sheet = workbook.createSheet();
-		sheet.setDefaultColumnWidth((short)18);
-		HSSFRow row = sheet.createRow(0);
-		for(short i=0;i< headers.length; i++) {
-			HSSFCell cell = row.createCell(i);
-			HSSFRichTextString text = new HSSFRichTextString(headers[i]);
-			cell.setCellValue(text);
-		}
 		List<Fraction> crs_list = fractionmapper.showMark(own.getUserid());
-		Iterator<Fraction> it = crs_list.iterator();
-		int index = 0;
-		while(it.hasNext()) {
-			index++;
-			row = sheet.createRow(index);
-			Fraction course = it.next();
-			
-			Field[] fields = course.getClass().getDeclaredFields();
-			for(short i = 1;i< fields.length;i++) {
-				HSSFCell cell = row.createCell(i-1);
-				Field field = fields[i];
-				String fieldName = field.getName();
-				String getMethodName = "get" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1); 
-				try {
-					Class stu_Cls = course.getClass();
-					Method getMethod = stu_Cls.getMethod(getMethodName, new Class[] {});
-					Object value = getMethod.invoke(course, new Object[] {});
-					String textValue = value.toString();
-					HSSFRichTextString richString = new HSSFRichTextString(textValue);
-					HSSFFont font3 = workbook.createFont();
-					font3.setColor(HSSFColor.HSSFColorPredefined.BLUE.getIndex());
-					richString.applyFont(font3);
-					cell.setCellValue(richString);
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		response.setContentType("application/octet-stream");
-		response.setHeader("Content-disposition", "attachment;filename=CourseList"+(new Date()).toString()+".xls");
-		response.flushBuffer();
-		workbook.write(response.getOutputStream());
+		DownLoadMessage<Fraction> download = new DownLoadMessage<>(headers, crs_list, response);
+		download.download();
 	}
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>下载课程信息<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 	@RequestMapping(value="/student/downloadCourse")
 	public void downloadCourse(HttpServletRequest request,HttpServletResponse response) throws IOException {
 		String[] headers = {"课程ID","课程代码","课程名称","课程属性","课程学分","课程学期","课程时间","课程周次","课程班级","课程老师","课程地址"};
-		HSSFWorkbook workbook = new HSSFWorkbook();
-		HSSFSheet sheet = workbook.createSheet();
-		sheet.setDefaultColumnWidth((short)18);
-		HSSFRow row = sheet.createRow(0);
-		for(short i=0;i< headers.length; i++) {
-			HSSFCell cell = row.createCell(i);
-			HSSFRichTextString text = new HSSFRichTextString(headers[i]);
-			cell.setCellValue(text);
-		}
 		List<Course> crs_list = coursemapper.stu_showCourse(own.getStu_class());
-		Iterator<Course> it = crs_list.iterator();
-		int index = 0;
-		while(it.hasNext()) {
-			index++;
-			row = sheet.createRow(index);
-			Course course = it.next();
-			
-			Field[] fields = course.getClass().getDeclaredFields();
-			for(short i = 0;i< fields.length;i++) {
-				HSSFCell cell = row.createCell(i);
-				Field field = fields[i];
-				String fieldName = field.getName();
-				String getMethodName = "get" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1); 
-				try {
-					Class stu_Cls = course.getClass();
-					Method getMethod = stu_Cls.getMethod(getMethodName, new Class[] {});
-					Object value = getMethod.invoke(course, new Object[] {});
-					String textValue = value.toString();
-					HSSFRichTextString richString = new HSSFRichTextString(textValue);
-					HSSFFont font3 = workbook.createFont();
-					font3.setColor(HSSFColor.HSSFColorPredefined.BLUE.getIndex());
-					richString.applyFont(font3);
-					cell.setCellValue(richString);
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		response.setContentType("application/octet-stream");
-		response.setHeader("Content-disposition", "attachment;filename=CourseList"+(new Date()).toString()+".xls");
-		response.flushBuffer();
-		workbook.write(response.getOutputStream());
+		DownLoadMessage<Course> download = new DownLoadMessage<>(headers, crs_list, response);
+		download.download();
 	}
 	
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>个人信息<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
@@ -372,6 +287,53 @@ public class StudentController {
 	public ModelAndView showUserInfo(HttpServletRequest request,HttpServletResponse response) {
 		ModelAndView mav = new ModelAndView("student/showUserInfo");
 		mav.addObject("own", own);
+		mav.addObject("username",username);
+		return mav;
+	}
+	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>选择课程<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+	@RequestMapping(value="/student/showElectiveCourse")
+	public ModelAndView chooseCourse(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
+		ModelAndView mav = new ModelAndView("student/showElectiveCourse");
+		Integer userid = own.getUserid();
+		String crs_attribute = "选修";
+		
+		List<MoMCourse> momlist = momcoursemapper.electivecourses(userid, crs_attribute);
+		for (MoMCourse moMCourse : momlist) {
+			if(fractionmapper.isEmpty(userid,moMCourse.getCrs_code()) == null) {
+				mav = new ModelAndView("student/showElectiveCourse1");
+			}
+		}
+		
+		List<Course> crs_list = coursemapper.showElectiveCourse();
+		Integer pagenum = (int) Math.ceil((double)crs_list.size()/pagesize);
+		List<Course> pageList = coursemapper.pageElectiveCourse(start, pagesize);
+		if(request.getParameter("page") != null) {
+			Integer newstart = start+pagesize*(Integer.parseInt(request.getParameter("page"))-1);
+			Integer newpagesize = Integer.parseInt(request.getParameter("page"))*pagesize;
+			pageList = coursemapper.pageElectiveCourse(newstart, newpagesize);
+		}
+		Integer page;
+		if(request.getParameter("page") == null || Integer.parseInt(request.getParameter("page")) == 1) {
+			page = 1;
+		}else if (Integer.parseInt(request.getParameter("page")) == pagenum){
+			page = pagenum;
+		}else {
+			page = Integer.parseInt(request.getParameter("page"));
+		}
+		mav.addObject("pagenum",pagenum);
+		mav.addObject("page", page);
+		mav.addObject("crs_list",pageList);
+		mav.addObject("username",username);
+		return mav;
+	}
+	
+	@RequestMapping(value="/student/addElectiveCourse")
+	public ModelAndView electiveCourse(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
+		ModelAndView mav = new ModelAndView("redirect:showElectiveCourse");
+		String crs_code = new String(request.getParameter("crs_code").getBytes("ISO-8859-1"),"UTF-8");
+		String crs_attribute = "选修";
+		Integer userid = own.getUserid();
+		momcoursemapper.addInfo(userid, crs_code,crs_attribute);
 		return mav;
 	}
 	/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>登出<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/

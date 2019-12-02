@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon" />
 	<meta charset="UTF-8">
 	<title>添加学生信息</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
@@ -76,7 +77,7 @@
 	</div>
 </body>
 	<script type="text/javascript">
-	$("#nav li:nth-child(4)").addClass("active");
+	$("#nav li:nth-child(6)").addClass("active");
 	$(document).ready(function(){
 		$('input').iCheck({
 			checkboxClass:'icheckbox_square-green',

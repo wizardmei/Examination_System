@@ -5,7 +5,9 @@
 	<ul class="nav nav-pills nav-stacked" id="nav">
 		<li><a href="${pageContext.request.contextPath}/admin/showStudent"><h4>学生管理<span class="badge pull-right">${stu_num }</span></h4></a></li>
 		<li><a href="${pageContext.request.contextPath}/admin/showCourse"><h4>课程管理<span class="badge pull-right">${crs_num }</span></h4></a></li>
+		<li><a href="${pageContext.request.contextPath}/admin/ElectiveCourse"><h4>选课管理<span class="badge pull-right"></span></h4></a></li>
 		<li><a href="${pageContext.request.contextPath}/admin/showTeacher"><h4>教师管理<span class="badge pull-right">${tcr_num }</span></h4></a></li>
+		<li><a href="${pageContext.request.contextPath}/admin/uploadMessage"><h4>导入信息<span class="glyphicon glyphicon-open-file pull-right"></span></h4></a></li>
 		<li><a href="${pageContext.request.contextPath}/admin/userReset"><h4>账号密码重置<span class="glyphicon glyphicon-repeat pull-right"></span></h4></a></li>
 		<li><a href="${pageContext.request.contextPath}/admin/resetPasswd"><h4>修改密码<span class="glyphicon glyphicon-pencil pull-right"></span></h4></a></li>
 		<li><a href="${pageContext.request.contextPath}/admin/logout"><h4>退出系统<span class="glyphicon glyphicon-log-out pull-right"></span></h4></a></li>
